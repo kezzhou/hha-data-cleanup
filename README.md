@@ -3,7 +3,7 @@
 
 ## This repo concerns using the Pandas package to import and reformat data for readibility. In this particular example, we use a dataset named "School Learning Modalities," taken from source: https://healthdata.gov/National/School-Learning-Modalities/aitj-yx37
 
-## This repo contains a data folder, which contains subfolders raw and clean (denoting the nature of the data they contain). The untouched file version of "School Learning Modalities" is found in /HHA-DATA-ClEANUP/data/raw. The scripts folder contains datacleanup.py which contains the script for modifying the data.
+## This repo contains a data folder, which contains subfolders raw and clean (denoting the nature of the data they contain). The untouched file version of "School Learning Modalities" is found in /hha-data-cleanup/data/raw. The scripts folder contains datacleanup.py which contains the script for modifying the data.
 
 ## In datacleanup.py we accomplish:
 ##      1. Loading in the dataset
