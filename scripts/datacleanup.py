@@ -6,9 +6,8 @@
 
 #### Import packages ####
 
-from itertools import count
-import pandas as pd ## for this exercise we'll only require pandas for its data handling capabilities
-
+import pandas as pd ## for this exercise we'll most rely on pandas for its data handling capabilities
+import numpy as np ## numpy for missing data
 
 
 #### Loading in data ####
@@ -57,19 +56,64 @@ df.columns
 
 cols = df.select_dtypes(object).columns ## here we select all string types in all columns in preparation for purging whitespace and special characters in all of them
 
+df[cols] = df[cols].apply(lambda x: x.str.lower()) ## converting string values to lowercase
+
 df[cols] = df[cols].apply(lambda x: x.str.strip()) ## we use df.apply and lambda x here to apply the str.strip function to all selected objects
 
 df.head ## we can use df.head or df.sample or any other visualizing command to help us check progress
 
-df[cols] = df[cols].apply(lambda x: x.str.replace('[^A-Za-z0-9]+', '_') ## we use df.apply again with str.replace to take care of special characters and replace them with underscore
+df[cols] = df[cols].apply(lambda x: x.str.replace('[^A-Za-z0-9]+', '_')) ## IT IS RECOMMENDED TO RUN THIS LINE AFTER LINE 80 AS IT WILL MESS WITH DATETIME CONVERSION
+## this will replace special characters in cells with underscore
 
-df.head
 
-df[cols] =df[cols].apply(lambda x: x.str.count('[^A-Za-z0-9]+'))
 
-df['week'] = df['week'].str.count('[^A-Za-z0-9]+')
+#### Assessing whitespace and special characters
+
+print(df[cols].apply(lambda x: x.str.count('[^A-Za-z0-9]+'))) ## counting special characters in every string-based cell
+
+print(df[cols].apply(lambda x: x.str.count(' '))) ## counting whitespace in every string-based cell
+
+
 
 
 #### Converting column types appropriately ####
 
+df.dtypes ## this lists each column name and its corresponding dtype
 
+df.sample ## we can then use df.sample or an vs code extension to preview the csv and judge if the elements' dtypes are appropriate
+
+df['week'] = pd.to_datetime(df['week']) ## it looks like 'week' is the only odd one out with its format as string despite it being datetime.
+## there is a time value present as well but it seems to be 12:00:00 AM for all rows. we can safely exclude that portion and go ahead with datetime
+
+df.dtypes ## to check our work
+
+df.sample
+
+#### Finding duplicate rows and removing them ####
+
+df.duplicated(keep='first') ## this labels all 'first' occurence of rows as unique (boolean value false) and all duplicate occurences after that as duplicate (boolean value true)
+
+df.drop_duplicates(keep=False) ## this function drops all duplicates based on parameters. in this case keep is labeled false so that no instance of duplicates are kept
+
+## it seems like this dataset has no duplicates because the row number did not change. still, it is a good measure to take
+
+
+
+#### Assess missing data ####
+
+df.isnull().count() ## provides a count of missing values in each column
+
+df.replace(to_replace='', value=np.nan, inplace=True) ## replacing empty cells with NaN with numpy
+
+df.replace(to_replace=' ', value=np.nan, inplace=True) ## replacing cells with whitespace with NaN
+
+df.sample ## check our work
+
+
+
+#### Creating new data ####
+
+df['modality_inperson'] = (df['learning_modality'].apply(lambda x: 'true' if x == 'in_person' else 'false')) ## here we create a new column named modality_inperson which is based off the value of learning_modality
+## rows with value 'in_person' will see a corresponding cell in the new column with value 'true'
+
+df.to_csv('data/clean/school_learning_modalities_mod.csv') ## we burn our results into a new csv under /data/clean
